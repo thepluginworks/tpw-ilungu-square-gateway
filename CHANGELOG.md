@@ -2,6 +2,10 @@
 
 All notable changes to TPW Square Gateway are documented in this file.
 
+## 1.1.1 - 2026-03-25
+
+- Added a public `readme.txt` in standard WordPress plugin format with concise setup guidance, requirements, and FAQ content for site admins.
+
 ## 1.1.0 - 2026-03-25
 
 - Added a GitHub release packaging flow that builds a filtered `tpw-square-gateway.zip` archive using `.distignore` and preserves the correct `tpw-square-gateway/` root folder.
