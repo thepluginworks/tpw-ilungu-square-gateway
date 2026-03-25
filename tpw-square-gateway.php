@@ -5,7 +5,7 @@
  * Description: Square payment gateway add-on for TPW Core with direct HTTP payment processing and frontend SDK ownership.
  * Author: ThePluginWorks
  * Author URI: https://thepluginworks.com/
- * Version: 1.0.0
+ * Version: 1.1.0
  * Text Domain: tpw-square-gateway
  * Domain Path: /languages
  */
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'TPW_SQUARE_GATEWAY_PLUGIN_VERSION' ) ) {
-    define( 'TPW_SQUARE_GATEWAY_PLUGIN_VERSION', '1.0.0' );
+    define( 'TPW_SQUARE_GATEWAY_PLUGIN_VERSION', '1.1.0' );
 }
 
 if ( ! defined( 'TPW_SQUARE_GATEWAY_VERSION' ) ) {
@@ -31,6 +31,7 @@ if ( ! defined( 'TPW_SQUARE_GATEWAY_URL' ) ) {
 }
 
 require_once TPW_SQUARE_GATEWAY_PATH . 'includes/class-tpw-square-gateway-loader.php';
+require_once TPW_SQUARE_GATEWAY_PATH . 'includes/class-tpw-square-gateway-updater.php';
 require_once TPW_SQUARE_GATEWAY_PATH . 'includes/class-tpw-square-gateway-core-integration.php';
 require_once TPW_SQUARE_GATEWAY_PATH . 'includes/class-tpw-square-gateway-compatibility-loader.php';
 require_once TPW_SQUARE_GATEWAY_PATH . 'includes/class-tpw-square-gateway-direct-http-client.php';
@@ -56,5 +57,6 @@ function tpw_square_gateway_load_textdomain() {
 
 add_action( 'plugins_loaded', 'tpw_square_gateway_bootstrap', 20 );
 function tpw_square_gateway_bootstrap() {
+    TPW_Square_Gateway_Updater::init();
     TPW_Square_Gateway_Loader::bootstrap();
 }

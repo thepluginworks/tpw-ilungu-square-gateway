@@ -1,0 +1,16 @@
+# Files to exclude from release packages
+/.github
+/scripts
+/.git
+/.gitattributes
+/.distignore
+/.gitignore
+/.DS_Store
+**/.DS_Store
+/README.md
+/CHANGELOG.md
+/*.md
+/*.yml
+/*.yaml
+/*.xml
+/*.dist

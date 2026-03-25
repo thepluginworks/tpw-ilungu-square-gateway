@@ -1,6 +1,6 @@
 # TPW Square Gateway
 
-Current version: 1.0.0
+Current version: 1.1.0
 
 TPW Square Gateway is the production Square payments add-on for TPW Core. It moves Square ownership out of Core while preserving the existing TPW checkout flow, settings keys, frontend payment boot process, and legacy `TPW_Square_Gateway` compatibility surface used by existing TPW integrations.
 
@@ -31,3 +31,11 @@ TPW Square Gateway is the production Square payments add-on for TPW Core. It mov
 ## Version History
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.
+
+## Updates
+
+TPW Square Gateway is distributed through GitHub releases.
+
+- Production install packages are published as `tpw-square-gateway.zip` with the correct `tpw-square-gateway/` archive root.
+- WordPress update checks read the public manifest at `https://thepluginworks.github.io/tpw-square-gateway/tpw-square-gateway.json`.
+- One-click updates use the exact tagged GitHub release asset URL published in that manifest.

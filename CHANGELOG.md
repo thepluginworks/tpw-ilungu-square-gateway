@@ -2,6 +2,12 @@
 
 All notable changes to TPW Square Gateway are documented in this file.
 
+## 1.1.0 - 2026-03-25
+
+- Added a GitHub release packaging flow that builds a filtered `tpw-square-gateway.zip` archive using `.distignore` and preserves the correct `tpw-square-gateway/` root folder.
+- Added a GitHub Actions release workflow that publishes the release asset, generates `tpw-square-gateway.json`, and deploys the manifest through GitHub Pages.
+- Added a WordPress-native GitHub updater that reads the public manifest, handles context-aware cache refresh behaviour, injects update metadata into plugin update transients, and provides plugin details for the update modal.
+
 ## 1.0.0 - 2026-03-20
 
 First stable production release.
