@@ -39,7 +39,7 @@ class TPW_Square_Gateway_Admin {
         }
 
         echo '<div class="notice notice-warning"><p>';
-        echo esc_html__( 'TPW Square Gateway is installed, but TPW Core is not active. The add-on remains inactive until TPW Core is available.', 'tpw-square-gateway' );
+        echo esc_html__( 'TPW Square Gateway is installed, but FlexiClub is not active. The add-on remains inactive until FlexiClub is available.', 'tpw-square-gateway' );
         echo '</p></div>';
     }
 

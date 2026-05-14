@@ -137,7 +137,7 @@ class TPW_Square_Gateway_Updater {
             'download_link' => $download_link,
             'external'      => true,
             'sections'      => array(
-                'description' => '<p>TPW Square Gateway provides the Square payment gateway add-on for TPW Core, including direct HTTP payment processing, settings ownership, and legacy compatibility bridges.</p>',
+                'description' => '<p>TPW Square Gateway provides the Square payment gateway add-on for FlexiClub, including direct HTTP payment processing, settings ownership, and legacy compatibility bridges.</p>',
                 'changelog'   => self::build_changelog_section(),
             ),
         );

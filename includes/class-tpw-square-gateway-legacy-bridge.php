@@ -39,7 +39,7 @@ class TPW_Square_Gateway_Legacy_Bridge {
     }
 
     public static function load_core_implementation(): void {
-        $path = WP_PLUGIN_DIR . '/tpw-core/modules/payments/gateways/class-tpw-square-gateway.php';
+        $path = WP_PLUGIN_DIR . '/tpw-flexiclub/modules/payments/gateways/class-tpw-square-gateway.php';
 
         if ( file_exists( $path ) && ! class_exists( self::implementation_class(), false ) ) {
             require_once $path;

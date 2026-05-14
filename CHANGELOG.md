@@ -2,6 +2,11 @@
 
 All notable changes to TPW Square Gateway are documented in this file.
 
+## 1.1.2 - 2026-05-14
+
+- Updated plugin descriptions, admin notices, and public-facing documentation to refer to FlexiClub instead of TPW Core.
+- Updated the legacy bridge loader path to the FlexiClub plugin location so compatibility loading continues to work after the platform rename.
+
 ## 1.1.1 - 2026-03-25
 
 - Added a public `readme.txt` in standard WordPress plugin format with concise setup guidance, requirements, and FAQ content for site admins.
