@@ -39,11 +39,35 @@ class TPW_Square_Gateway_Legacy_Bridge {
     }
 
     public static function load_core_implementation(): void {
-        $path = WP_PLUGIN_DIR . '/tpw-flexiclub/modules/payments/gateways/class-tpw-square-gateway.php';
-
-        if ( file_exists( $path ) && ! class_exists( self::implementation_class(), false ) ) {
-            require_once $path;
+        if ( class_exists( self::implementation_class(), false ) ) {
+            return;
         }
+
+        foreach ( self::implementation_paths() as $path ) {
+            if ( ! file_exists( $path ) ) {
+                continue;
+            }
+
+            require_once $path;
+
+            if ( class_exists( self::implementation_class(), false ) ) {
+                return;
+            }
+        }
+    }
+
+    protected static function implementation_paths(): array {
+        $implementation_file = 'modules/payments/gateways/class-tpw-square-gateway.php';
+        $paths               = array();
+
+        if ( defined( 'TPW_CORE_PATH' ) ) {
+            $paths[] = rtrim( (string) TPW_CORE_PATH, '/\\' ) . '/' . $implementation_file;
+        }
+
+        $paths[] = WP_PLUGIN_DIR . '/tpw-flexiclub/' . $implementation_file;
+        $paths[] = WP_PLUGIN_DIR . '/tpw-ilungu-club/' . $implementation_file;
+
+        return array_unique( $paths );
     }
 }
 

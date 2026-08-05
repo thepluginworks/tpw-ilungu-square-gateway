@@ -5,7 +5,7 @@
  * Description: Square payment gateway add-on for FlexiClub with direct HTTP payment processing and frontend SDK ownership.
  * Author: ThePluginWorks
  * Author URI: https://thepluginworks.com/
- * Version: 1.1.2
+ * Version: 1.1.3
  * Text Domain: tpw-square-gateway
  * Domain Path: /languages
  */
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! defined( 'TPW_SQUARE_GATEWAY_PLUGIN_VERSION' ) ) {
-    define( 'TPW_SQUARE_GATEWAY_PLUGIN_VERSION', '1.1.2' );
+    define( 'TPW_SQUARE_GATEWAY_PLUGIN_VERSION', '1.1.3' );
 }
 
 if ( ! defined( 'TPW_SQUARE_GATEWAY_VERSION' ) ) {

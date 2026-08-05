@@ -3,7 +3,7 @@ Contributors: thepluginworks
 Tags: square, payments, tpw
 Requires at least: 6.0
 Requires PHP: 7.4
-Stable tag: 1.1.2
+Stable tag: 1.1.3
 
 Add Square payment processing to FlexiClub with direct HTTP payments and compatibility for existing TPW checkout flows.
 
@@ -41,6 +41,10 @@ No. TPW Square Gateway extends FlexiClub and should be used alongside an active 
 You need a Square application ID, access token, and location ID for the account you want to process payments with.
 
 == Changelog ==
+
+= 1.1.3 =
+
+* Updated the legacy Square bridge to prefer the shared Core path contract and support both `tpw-flexiclub` and `tpw-ilungu-club` plugin folder locations.
 
 = 1.1.2 =
 

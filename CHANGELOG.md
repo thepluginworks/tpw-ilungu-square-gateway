@@ -2,6 +2,10 @@
 
 All notable changes to TPW Square Gateway are documented in this file.
 
+## 1.1.3 - 2026-08-05
+
+- Updated the legacy Square bridge to prefer the established shared Core path contract and support both `tpw-flexiclub` and `tpw-ilungu-club` plugin folder locations.
+
 ## 1.1.2 - 2026-05-14
 
 - Updated plugin descriptions, admin notices, and public-facing documentation to refer to FlexiClub instead of TPW Core.

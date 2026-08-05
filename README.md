@@ -1,6 +1,6 @@
 # TPW Square Gateway
 
-Current version: 1.1.2
+Current version: 1.1.3
 
 TPW Square Gateway is the production Square payments add-on for FlexiClub. It moves Square ownership out of the base platform while preserving the existing TPW checkout flow, settings keys, frontend payment boot process, and legacy `TPW_Square_Gateway` compatibility surface used by existing TPW integrations.
 
