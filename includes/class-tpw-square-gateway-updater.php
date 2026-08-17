@@ -1,6 +1,6 @@
 <?php
 /**
- * Lightweight GitHub-based updater for TPW Square Gateway.
+ * Lightweight GitHub-based updater for iLungu Square Gateway.
  *
  * Reads the public version manifest, caches it, injects updates into the
  * standard WordPress plugin update transient, and supplies plugin information
@@ -14,14 +14,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 class TPW_Square_Gateway_Updater {
-    const MANIFEST_URL = 'https://thepluginworks.github.io/tpw-square-gateway/tpw-square-gateway.json';
-    const PLUGIN_SLUG = 'tpw-square-gateway';
-    const PLUGIN_BASENAME = 'tpw-square-gateway/tpw-square-gateway.php';
+    const MANIFEST_URL = 'https://thepluginworks.github.io/tpw-ilungu-square-gateway/tpw-ilungu-square-gateway.json';
+    const PLUGIN_SLUG = 'tpw-ilungu-square-gateway';
+    const PLUGIN_BASENAME = 'tpw-ilungu-square-gateway/ilungu-square-gateway.php';
     const CACHE_KEY = 'tpw_square_gateway_update_manifest';
     const CACHE_TTL = 12 * HOUR_IN_SECONDS;
     const FAILURE_CACHE_TTL = HOUR_IN_SECONDS;
     const HOMEPAGE = 'https://thepluginworks.com/';
-    const RELEASES_URL = 'https://github.com/thepluginworks/tpw-square-gateway/releases';
+    const RELEASES_URL = 'https://github.com/thepluginworks/tpw-ilungu-square-gateway/releases';
 
     /**
      * @var array<string, string|int>|null
@@ -85,7 +85,7 @@ class TPW_Square_Gateway_Updater {
                 'new_version' => $installed_version,
                 'package'     => '',
                 'url'         => self::HOMEPAGE,
-                'id'          => self::HOMEPAGE . '#tpw-square-gateway',
+                'id'          => self::HOMEPAGE . '#tpw-ilungu-square-gateway',
             );
             return $transient;
         }
@@ -96,7 +96,7 @@ class TPW_Square_Gateway_Updater {
             'new_version' => $manifest['version'],
             'package'     => $manifest['download_url'],
             'url'         => self::HOMEPAGE,
-            'id'          => self::HOMEPAGE . '#tpw-square-gateway',
+            'id'          => self::HOMEPAGE . '#tpw-ilungu-square-gateway',
         );
 
         if ( isset( $transient->no_update[ self::PLUGIN_BASENAME ] ) ) {
@@ -128,16 +128,16 @@ class TPW_Square_Gateway_Updater {
         $download_link = ! empty( $manifest['download_url'] ) ? $manifest['download_url'] : self::RELEASES_URL;
 
         return (object) array(
-            'name'          => 'TPW Square Gateway',
+            'name'          => 'iLungu Square Gateway',
             'slug'          => self::PLUGIN_SLUG,
-            'plugin_name'   => 'TPW Square Gateway',
+            'plugin_name'   => 'iLungu Square Gateway',
             'version'       => $version,
             'author'        => '<a href="' . esc_url( self::HOMEPAGE ) . '">ThePluginWorks</a>',
             'homepage'      => self::HOMEPAGE,
             'download_link' => $download_link,
             'external'      => true,
             'sections'      => array(
-                'description' => '<p>TPW Square Gateway provides the Square payment gateway add-on for FlexiClub, including direct HTTP payment processing, settings ownership, and legacy compatibility bridges.</p>',
+                'description' => '<p>iLungu Square Gateway provides the Square payment gateway add-on for iLungu Club, including direct HTTP payment processing, settings ownership, and legacy compatibility bridges.</p>',
                 'changelog'   => self::build_changelog_section(),
             ),
         );
@@ -237,7 +237,7 @@ class TPW_Square_Gateway_Updater {
             self::MANIFEST_URL,
             array(
                 'timeout'    => 10,
-                'user-agent' => 'TPW Square Gateway Updater/' . TPW_SQUARE_GATEWAY_VERSION . '; ' . home_url( '/' ),
+                'user-agent' => 'iLungu Square Gateway Updater/' . TPW_SQUARE_GATEWAY_VERSION . '; ' . home_url( '/' ),
             )
         );
 

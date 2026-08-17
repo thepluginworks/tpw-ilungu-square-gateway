@@ -1,6 +1,10 @@
 # Changelog
 
-All notable changes to TPW Square Gateway are documented in this file.
+## 1.1.4 - 2026-08-17
+
+- Renamed the public product to iLungu Square Gateway and migrated the release package identity to `tpw-ilungu-square-gateway`.
+
+All notable changes to iLungu Square Gateway are documented in this file.
 
 ## 1.1.3 - 2026-08-05
 

@@ -17,7 +17,7 @@ permissions:
   id-token: write
 
 concurrency:
-  group: tpw-square-gateway-release
+  group: tpw-ilungu-square-gateway-release
   cancel-in-progress: false
 
 jobs:
@@ -51,7 +51,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          PLUGIN_VERSION="$(grep -m1 '^ \* Version:' tpw-square-gateway.php | sed 's/^ \* Version: *//')"
+          PLUGIN_VERSION="$(grep -m1 '^ \* Version:' ilungu-square-gateway.php | sed 's/^ \* Version: *//')"
           INPUT_TAG="${{ inputs.tag }}"
 
           if [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
@@ -70,8 +70,8 @@ jobs:
           fi
 
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
-          DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/tpw-square-gateway.zip"
-          MANIFEST_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${REPO_NAME}/tpw-square-gateway.json"
+          DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG_NAME}/tpw-ilungu-square-gateway.zip"
+          MANIFEST_URL="https://${GITHUB_REPOSITORY_OWNER}.github.io/${REPO_NAME}/tpw-ilungu-square-gateway.json"
           RELEASE_URL="https://github.com/${GITHUB_REPOSITORY}/releases/tag/${TAG_NAME}"
 
           echo "plugin_version=${PLUGIN_VERSION}" >> "$GITHUB_OUTPUT"
@@ -87,7 +87,7 @@ jobs:
         run: |
           set -euo pipefail
 
-          ZIP_PATH="$RUNNER_TEMP/tpw-square-gateway.zip"
+          ZIP_PATH="$RUNNER_TEMP/tpw-ilungu-square-gateway.zip"
           bash scripts/build-release-package.sh "$ZIP_PATH"
 
           echo "zip_path=${ZIP_PATH}" >> "$GITHUB_OUTPUT"
@@ -99,8 +99,8 @@ jobs:
 
           FIRST_ENTRY="$(unzip -Z1 "${{ steps.package.outputs.zip_path }}" | head -n 1)"
 
-          if [ "$FIRST_ENTRY" != 'tpw-square-gateway/' ]; then
-            echo "Expected archive root to be tpw-square-gateway/, got: $FIRST_ENTRY" >&2
+          if [ "$FIRST_ENTRY" != 'tpw-ilungu-square-gateway/' ]; then
+            echo "Expected archive root to be tpw-ilungu-square-gateway/, got: $FIRST_ENTRY" >&2
             exit 1
           fi
 
@@ -116,11 +116,11 @@ jobs:
           ZIP_PATH="${{ steps.package.outputs.zip_path }}"
 
           if gh release view "$TAG_NAME" >/dev/null 2>&1; then
-            gh release upload "$TAG_NAME" "$ZIP_PATH#tpw-square-gateway.zip" --clobber
+            gh release upload "$TAG_NAME" "$ZIP_PATH#tpw-ilungu-square-gateway.zip" --clobber
           else
-            gh release create "$TAG_NAME" "$ZIP_PATH#tpw-square-gateway.zip" \
-              --title "TPW Square Gateway ${VERSION}" \
-              --notes "Automated release for TPW Square Gateway ${VERSION}." \
+            gh release create "$TAG_NAME" "$ZIP_PATH#tpw-ilungu-square-gateway.zip" \
+              --title "iLungu Square Gateway ${VERSION}" \
+              --notes "Automated release for iLungu Square Gateway ${VERSION}." \
               --target "$GITHUB_SHA"
           fi
 
@@ -130,7 +130,7 @@ jobs:
           set -euo pipefail
 
           mkdir -p dist
-          cat > dist/tpw-square-gateway.json <<EOF
+          cat > dist/tpw-ilungu-square-gateway.json <<EOF
           {
             "version": "${{ steps.metadata.outputs.version }}",
             "download_url": "${{ steps.metadata.outputs.download_url }}"
