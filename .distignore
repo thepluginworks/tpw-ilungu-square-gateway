@@ -14,3 +14,4 @@
 /*.yaml
 /*.xml
 /*.dist
+tests/

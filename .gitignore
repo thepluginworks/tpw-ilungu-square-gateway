@@ -1,1 +1,47 @@
+# === OS / Editor ===
 .DS_Store
+Thumbs.db
+__MACOSX/
+.vscode/
+.idea/
+
+# === Dependency directories ===
+node_modules/
+# Uncomment if Composer dependencies are build-only and should not be committed.
+# vendor/
+
+# === Logs / debug output ===
+*.log
+*.debug
+*.tmp
+debug.log
+error_log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# === Environment / local-only files ===
+.env
+.env.*
+!tests/playwright/.env.example
+tests/playwright/.env.local
+
+# === Build / release artifacts ===
+*.zip
+dist/
+build/
+release/
+
+# === Local tooling artifacts ===
+composer.phar
+composer-setup.php
+.phpunit.result.cache
+
+# === Playwright artifacts ===
+tests/playwright/playwright-report/
+tests/playwright/test-results/
+tests/playwright/storage-state/
+
+# === Project-local notes ===
+ai-session.md
