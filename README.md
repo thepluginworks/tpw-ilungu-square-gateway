@@ -39,3 +39,11 @@ iLungu Square Gateway is distributed through GitHub releases.
 - Production install packages are published as `tpw-ilungu-square-gateway.zip` with the correct `tpw-ilungu-square-gateway/` archive root.
 - WordPress update checks read the public manifest at `https://thepluginworks.github.io/tpw-ilungu-square-gateway/tpw-ilungu-square-gateway.json`.
 - One-click updates use the exact tagged GitHub release asset URL published in that manifest.
+
+## Data Retention
+
+- Deactivation is non-destructive and uninstall preserves all data by default.
+- Administrators can enable **Delete all plugin data on uninstall** from the Square settings page. This opt-in removes only the Square Gateway updater cache and Core-missing notice transient.
+- Existing Square configuration options are retained because they are compatibility state that can pre-date this add-on and is shared with iLungu Club.
+- iLungu Club payment methods, RSVP payments, payment logs, submissions, and other shared records are never removed by this plugin.
+- Local uninstall never deletes remote Square payments, accounts, locations, credentials, customers, orders, refunds, webhooks, or provider records.

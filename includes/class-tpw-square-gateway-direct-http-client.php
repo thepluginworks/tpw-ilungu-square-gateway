@@ -25,12 +25,8 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
         $is_sandbox   = '1' === (string) get_option( 'tpw_square_sandbox_mode' );
         $location_id  = get_option( 'tpw_square_location_id' );
 
-        error_log( '[TPW DEBUG] Square environment: ' . ( $is_sandbox ? 'sandbox' : 'production' ) );
-        error_log( '[TPW DEBUG] location_id: ' . $location_id );
-        error_log( '[TPW DEBUG] access_token passed to direct HTTP client: ' . substr( (string) ( $access_token ?? 'null' ), 0, 10 ) . '...' );
-
         if ( empty( $access_token ) ) {
-            error_log( '[TPW ERROR] Square access token is missing.' );
+            error_log( '[TPW ERROR] Square payment request rejected: missing_access_token.' );
 
             return new WP_Error(
                 'square_payment_error',
@@ -40,12 +36,6 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
         }
 
         $request_body = self::build_request_body( $args, (string) $location_id );
-
-        error_log( '[TPW DEBUG] args: ' . print_r( $args, true ) );
-        error_log( '[TPW DEBUG] Nonce: ' . ( $args['nonce'] ?? 'null' ) );
-        error_log( '[TPW DEBUG] Token Length: ' . strlen( (string) $access_token ) );
-        error_log( '[TPW DEBUG] Location ID: ' . $location_id );
-        error_log( '[TPW DEBUG] Payment Request Body: ' . print_r( $request_body, true ) );
 
         $response = wp_remote_post(
             self::get_api_url( $is_sandbox ),
@@ -63,7 +53,7 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
         );
 
         if ( is_wp_error( $response ) ) {
-            error_log( '[TPW ERROR] HTTP payment error: ' . $response->get_error_message() );
+            error_log( '[TPW ERROR] Square payment request failed: transport_error.' );
 
             return new WP_Error(
                 'square_payment_error',
@@ -77,7 +67,7 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
         $payload     = json_decode( $raw_body, true );
 
         if ( ! is_array( $payload ) ) {
-            error_log( '[TPW ERROR] Invalid Square response body: ' . $raw_body );
+            error_log( '[TPW ERROR] Square payment response failed: invalid_json status=' . $status_code . '.' );
 
             return new WP_Error(
                 'square_payment_error',
@@ -116,7 +106,7 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
         }
 
         if ( empty( $payload['payment'] ) || ! is_array( $payload['payment'] ) ) {
-            error_log( '[TPW ERROR] Square response missing payment payload: ' . print_r( $payload, true ) );
+            error_log( '[TPW ERROR] Square payment response failed: missing_payment status=' . $status_code . '.' );
 
             return new WP_Error(
                 'square_payment_error',

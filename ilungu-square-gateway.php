@@ -39,6 +39,7 @@ require_once TPW_SQUARE_GATEWAY_PATH . 'includes/class-tpw-square-gateway-legacy
 require_once TPW_SQUARE_GATEWAY_PATH . 'includes/class-tpw-square-gateway-admin.php';
 require_once TPW_SQUARE_GATEWAY_PATH . 'includes/class-tpw-square-gateway-settings.php';
 require_once TPW_SQUARE_GATEWAY_PATH . 'includes/class-tpw-square-gateway-webhook-controller.php';
+require_once TPW_SQUARE_GATEWAY_PATH . 'includes/class-tpw-square-gateway-lifecycle.php';
 
 register_activation_hook( __FILE__, 'tpw_square_gateway_activate' );
 function tpw_square_gateway_activate() {

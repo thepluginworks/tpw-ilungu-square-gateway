@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+- Added an administrator-controlled, opt-in uninstall cleanup that removes only Square Gateway-owned runtime transients.
+- Preserved compatibility settings, iLungu Club payment data, and all remote Square provider records during uninstall.
+- Removed sensitive payment request diagnostics from the shared PHP error log.
+
 ## 1.1.4 - 2026-08-17
 
 - Renamed the public product to iLungu Square Gateway and migrated the release package identity to `tpw-ilungu-square-gateway`.

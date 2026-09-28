@@ -40,6 +40,10 @@ No. iLungu Square Gateway extends iLungu Club and should be used alongside an ac
 
 You need a Square application ID, access token, and location ID for the account you want to process payments with.
 
+= What happens when I deactivate or uninstall the plugin? =
+
+Deactivation is non-destructive. Uninstall preserves data by default. An administrator can enable Delete all plugin data on uninstall from the Square settings page; that opt-in removes only Square Gateway-owned local runtime state. Existing Square settings, iLungu Club payment records, and remote Square/provider records are always preserved.
+
 == Changelog ==
 
 = 1.1.3 =

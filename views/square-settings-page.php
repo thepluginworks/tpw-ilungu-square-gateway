@@ -72,6 +72,17 @@ if ( ! is_string( $current_label ) || '' == $current_label ) {
                     <input type="number" name="tpw_surcharge_square_fixed" id="tpw_surcharge_square_fixed" step="0.01" min="0" value="<?php echo esc_attr( get_option( 'tpw_surcharge_square_fixed', 0 ) ); ?>" />
                 </td>
             </tr>
+            <tr>
+                <th scope="row"><?php esc_html_e( 'Data retention', 'tpw-square-gateway' ); ?></th>
+                <td>
+                    <input type="hidden" name="tpw_square_gateway_delete_data_on_uninstall" value="0" />
+                    <label for="tpw_square_gateway_delete_data_on_uninstall">
+                        <input type="checkbox" name="tpw_square_gateway_delete_data_on_uninstall" id="tpw_square_gateway_delete_data_on_uninstall" value="1" <?php checked( TPW_Square_Gateway_Lifecycle::is_delete_data_on_uninstall_enabled() ); ?> />
+                        <?php esc_html_e( 'Delete all plugin data on uninstall', 'tpw-square-gateway' ); ?>
+                    </label>
+                    <p class="description"><?php esc_html_e( 'By default, deactivation and uninstall preserve data. When enabled, uninstall removes only Square Gateway-owned local runtime state. Existing Square settings, iLungu Club payment records, and Square provider records are preserved.', 'tpw-square-gateway' ); ?></p>
+                </td>
+            </tr>
         </table>
         <?php submit_button(); ?>
     </form>

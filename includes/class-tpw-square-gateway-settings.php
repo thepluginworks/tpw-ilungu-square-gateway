@@ -36,6 +36,13 @@ class TPW_Square_Gateway_Settings {
                 'sanitize_callback' => [ $this, 'sanitize_surcharge_value' ],
             ]
         );
+        register_setting(
+            'tpw_payment_settings',
+            TPW_Square_Gateway_Lifecycle::DELETE_DATA_OPTION,
+            [
+                'sanitize_callback' => [ 'TPW_Square_Gateway_Lifecycle', 'sanitize_delete_data_on_uninstall' ],
+            ]
+        );
     }
 
     public function sanitize_surcharge_value( $value ) {
