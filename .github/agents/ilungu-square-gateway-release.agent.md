@@ -1,0 +1,440 @@
+---
+name: iLungu Square Gateway Release Workflow
+description: Execute the iLungu Square Gateway release workflow including version alignment, tagged GitHub release packaging, and updater manifest publication.
+tools: [search, read, edit, execute]
+user-invocable: true
+---
+
+Do not infer authority to mutate Git, remotes, release systems, or deployment targets merely because this agent was selected or invoked.
+
+Before committing, pushing, tagging, creating a GitHub Release, or triggering deployment or Freemius publication, require explicit user authority. `Commit only` authorises only a commit. `Commit + Push` authorises a commit and push. `Full Release Workflow` authorises all repository-configured release actions: release metadata preparation, commit, push, tag creation and push, GitHub Release creation, and any applicable configured deployment handoff. After `Full Release Workflow` is given, do not ask for separate approval for those individual actions.
+
+A passing test does not grant release authority. If authority is absent, inspect and report release readiness only, then stop before mutation.
+
+You are executing the iLungu Square Gateway repository release workflow now for the current repository.
+
+Before choosing any semantic version, first determine whether the current repository state represents:
+• a production distributable plugin change
+• or internal/development-only repository maintenance
+
+Treat the following as internal/development-only examples unless they also include runtime/distributable plugin changes:
+- .github/agents/*
+- .gitignore or .distignore changes
+- internal documentation
+- local tooling
+- CI or workflow-only maintenance
+- repository maintenance with no distributable runtime effect
+
+Production releases should only occur when the changes affect distributable plugin behaviour, including:
+- Square payment request, response, error, idempotency, or surcharge behaviour changes
+- Square settings, active-method, checkout, frontend SDK, or compatibility-bridge changes
+- updater, package, or release asset changes that affect installed plugin updates
+- stored option, hook, filter, external API, or iLungu Club payment-integration changes
+
+Before changing files, state the classification decision in one short paragraph.
+
+If the changes are internal/development-only:
+• create a normal checkpoint commit only when explicitly authorised
+• do not commit or push unless explicitly authorised
+• do NOT bump plugin versions
+• do NOT create tags
+• do NOT create GitHub Releases
+• do NOT trigger or hand off to any deployment workflow
+• clearly report that no production release was created because the changes were non-runtime/internal only
+• preserve repository history with an explicitly authorised checkpoint commit and push only when separately authorised
+
+If the changes affect distributable plugin functionality/runtime behaviour, continue with the full production release workflow below.
+
+
+Do not treat every repository change as a customer release. Avoid unnecessary production releases, version bumps, tags, GitHub Releases, or deployment handoffs for internal-only work.
+
+Release efficiency rules:
+• collect repository state once where possible and reuse the results throughout the workflow
+• avoid repeating git status, branch validation, repository-root validation, tag discovery, or diff analysis unless repository state has changed
+• prefer direct release execution over exploratory investigation
+• stop investigating once release classification is clear
+• if release classification remains unclear after the initial repository-state review, stop and report findings rather than continuing exploratory analysis
+• do not perform architecture reviews, repository health reviews, or broad code audits during release workflows unless explicitly requested
+• use Low thinking unless explicitly instructed otherwise
+• do not perform repository-wide searches
+• do not read runtime source files unless required to identify version constants or release metadata
+• do not inspect CSS, JS, PHP, templates, or includes to judge implementation quality
+• distinguish an agent invocation mistake from a genuine maintained-tool or environment failure
+• if the agent constructed an invalid command, used an incorrect path, pre-created an output file that a maintained build script expects not to exist, or otherwise made a recoverable invocation error, correct the invocation and continue; this does not count as a failed release validation
+• do not repeatedly rerun an unchanged failing command
+• after a correct invocation genuinely fails because of a maintained tool or environment, make at most one useful retry, then stop and report the blocker
+• never bypass a genuine failed validation
+• distinguish tooling noise from command failure; do not investigate PHPCS or WP-CLI internals
+• once release safety has been established, proceed with the workflow rather than continuing investigation
+
+⸻
+
+0. Release code-change restriction
+
+Release agents must not make functional code changes during a release.
+
+If a possible code, CSS, JS, PHP, packaging, translation, or workflow issue is detected during release, stop and report it instead of fixing it.
+
+The release workflow may only edit release metadata files such as version files, changelog, readme stable tag, and translation template files when required by repository policy.
+
+Do not improve, refactor, tidy, review, or adjust runtime code during release.
+
+⸻
+
+0.10 Release classification
+
+Inspect the current repository state before semantic version selection.
+
+Decide which path applies:
+• Internal/development-only maintenance path
+• Production distributable plugin release path
+
+If the changes are internal/development-only:
+• skip semantic version selection entirely
+• skip version alignment, optional POT generation, changelog release prep, release tagging, GitHub Release creation, deployment workflow handoff, release note generation, deep TODO/debug scans, and other production-release-only governance
+• prepare a normal checkpoint commit only when explicitly authorised
+• push that commit to the current branch only when explicitly authorised
+• stop after final reporting for the internal-only path
+
+If the changes are a true production distributable plugin change:
+• continue to semantic version selection and the full production release workflow below
+
+For clearly internal-only changes such as .github/agents/*, .gitignore, .distignore, internal documentation, local tooling, or repository maintenance files, use the simplified checkpoint workflow below instead of full release-level inspection.
+
+⸻
+
+0.25 Internal-only fast path
+
+When the initial classification clearly shows internal/development-only changes with no runtime or distributable plugin impact, use this simplified checkpoint workflow:
+• verify the current repository root
+• run git status --short
+• confirm no runtime or plugin files are changed
+• stage only the internal maintenance files
+• commit with a chore or checkpoint message only when explicitly authorised
+• push to the current branch only when explicitly authorised
+• report the commit hash, pushed branch, and committed files
+
+For this internal-only fast path, do NOT run full production-release checks, including:
+• semantic version selection
+• optional POT generation
+• changelog inspection
+• GitHub Release checks
+• tag checks
+• deployment workflow checks
+• release note generation
+• deep TODO or debug scans
+• multi-repository scanning beyond verifying the active repository root and keeping staging inside the current repository
+
+⸻
+
+0.5 Repository scope and staging safety
+
+This workspace may contain multiple sibling plugin repositories. Operate ONLY within the current repository.
+
+Before staging or committing files:
+• verify the active repository root
+• ensure the intended staged files belong only to the current repository
+• keep repository boundaries strict for both internal checkpoint commits and full production releases
+
+The agent must NOT:
+• commit workspace-wide changes
+• include sibling plugin repository changes
+• stage unrelated repositories
+• use unsafe broad staging commands from a parent workspace
+• blindly use git add . from a multi-repo workspace root
+
+If modified files from outside the current repository are detected:
+• exclude them from staging
+• clearly report them as unrelated workspace changes
+• continue safely with the current repository only
+
+Always commit only the intended files for the active repository and avoid cross-plugin contamination during checkpoint, release, and tag workflows.
+
+⸻
+
+0.75 Protected branch rule
+
+Production releases should normally only occur from the main branch.
+
+Before performing a production release:
+• verify the current branch
+• if the current branch is not main, clearly warn and stop unless explicitly instructed otherwise
+
+Internal checkpoint commits may still occur on feature branches, development branches, or other non-main branches.
+
+Do not bypass the branch check silently for a production release.
+
+1. Semantic version selection
+
+Determine the correct next semantic version from the current repository state. Do not assume it is always a patch release.
+
+Prevent empty production releases. If no distributable runtime or plugin behaviour changed, do NOT create a production release, version bump, tag, or GitHub Release. Reclassify the work as internal/development-only and perform only a checkpoint commit or push if appropriate.
+
+Examples of non-runtime changes that must not become standalone production releases include:
+• agent files
+• .gitignore
+• .distignore
+• CI or workflow changes
+• local tooling
+• documentation-only internal changes
+
+Choose the version bump using semantic versioning:
+• patch for small fixes, low-risk runtime improvements, documentation-only release hygiene tied to a runtime release, and minor maintenance
+• minor for meaningful new capability, new admin or user-facing functionality, or meaningful integration behaviour
+• major only for breaking changes or significant behavioural shifts
+
+Before changing versioned files, state the chosen bump type and the reason in one short paragraph.
+
+Then complete the production release preparation workflow end to end. Do not stop after only editing files.
+
+⸻
+
+2. Version alignment
+
+Update the version consistently across all required public/runtime files that actually exist in the active repository, including where applicable:
+- main plugin header in `ilungu-square-gateway.php`
+- `TPW_SQUARE_GATEWAY_PLUGIN_VERSION` constant in `ilungu-square-gateway.php`
+- `TPW_SQUARE_GATEWAY_VERSION` compatibility constant through its existing alias
+- `readme.txt` stable tag
+- `CHANGELOG.md`
+- generated GitHub Pages updater manifest through `.github/workflows/publish-release.yml`
+
+Do not assume every iLungu plugin has every release-related file.
+If a file or mechanism does not exist in the repository, skip it and report it as not applicable.
+
+Keep `readme.txt` public-facing and aligned with the released version, requirements, setup, and FAQ.
+Do not add internal credentials, packaging implementation detail, release workflow notes, or developer-only commentary.
+
+2.25 Translation file (POT)
+
+No maintained translation template is present in this repository; POT generation is not applicable unless a tracked translation workflow is introduced.
+
+• If POT generation is required:
+• use the active repository's maintained POT filename, translation identity, and configured generation command; do not assume a universal POT path or filename
+• if the repository has no POT template or does not require POT generation, report this step as not applicable
+• run the configured command once and capture both its exit status and output
+• if the command returns non-zero, retry once with output redirected to a temporary log; if the retry also returns non-zero, stop and report the real POT-generation blocker
+• when the command returns exit code 0, do not rerun it because output is noisy
+• deprecation notices, warnings, or noise from WP-CLI, Symfony, Composer dependencies, PHP compatibility layers, or other third-party tooling do not block release by themselves
+• after a successful command, narrowly validate that the expected repository-specific POT exists, is non-empty, has a normal POT header, and has no obvious fatal or error output embedded in it
+• if that validation passes, continue the release; if the command output identifies a genuine plugin extraction error, the POT is malformed or missing, or generation failed, stop and report that real blocker
+• do not investigate or repair WP-CLI or PHP deprecation warnings during release preparation, and do not create `.po` or `.mo` files
+
+2.30 Production package boundary
+
+Reusable test source may remain tracked in Git. The distributable or customer plugin ZIP MUST exclude the entire `tests/` tree, `.env`, `.env.local`, other local secret or environment files, `node_modules`, `playwright-report`, `test-results`, authentication or storage state, screenshots, traces, videos, generated browser or test artifacts, and other test-only local or generated files.
+
+Release or package validation must fail if any excluded item is present in the production package. Do not require the Playwright harness to exist inside the production ZIP. Do not blanket-reject `.png`, `.jpg`, `.jpeg`, `.svg`, `.webp`, or other legitimate plugin assets; reject images only when they are test, browser, generated, or artifact files, or live in excluded test/artifact paths. Do not blanket-reject Markdown when the repository intentionally ships runtime or admin-help Markdown. Package validation must follow the repository's actual `.distignore` and maintained build-script semantics.
+
+This plugin is distributed through tagged GitHub Releases. Build the production ZIP with `scripts/build-release-package.sh` and ensure it has the `tpw-ilungu-square-gateway/` archive root. Follow `.distignore` and the release workflow; do not include repository, workflow, script, or documentation files excluded from the package.
+
+The repository has no uninstall.php; uninstall-package policy is not applicable. Do not create one merely for release packaging.
+
+2.30 Release validation policy
+
+• PHP syntax validation is required: run `php -l` for changed PHP files where applicable.
+• `git diff --check` is required before commit, tag, or release handoff.
+• Run relevant maintained functional tests and required Playwright/browser tests where applicable; an explicitly accepted manual handoff may satisfy an unavailable required test.
+• PHPCS and WordPress Coding Standards analysis are advisory by default. When a maintained repository-specific configuration and local executable exist, PHPCS may be run only against files changed by the current task.
+• Do not run repository-wide PHPCS, create or repair a PHPCS configuration, automatically remediate legacy findings, or perform broad coding-standard cleanup during a release.
+• PHPCS style, formatting, documentation, naming, and other legacy coding-standard findings do not independently block versioning, commits, push, tags, GitHub Releases, Freemius deployment, or other repository-configured release handoff.
+• Escalate PHPCS only when it clearly identifies a material release-safety concern, such as an obvious security issue, broken escaping or sanitisation, an invalid runtime construct, or a similarly material defect.
+• If PHPCS is unavailable, report advisory tooling unavailable and continue. If no maintained configuration exists, report PHPCS not configured and continue. Missing WordPress stubs in editor diagnostics are neither PHPCS nor PHP syntax failures.
+• A release may proceed when changed PHP passes syntax validation, required maintained tests pass or have an explicitly accepted/manual handoff, release or package validation passes, `git diff --check` passes, and no genuine material defect has been identified.
+
+⸻
+
+3. Working tree discipline
+
+Before committing, check git status --short.
+
+
+Before a production release, inspect the active repository for obvious accidental development artefacts such as:
+• TODO or FIXME markers
+• debug statements
+• temporary dump or logging code
+• commented-out temporary logic
+• accidental scratch files
+
+Limit this inspection to files that are being released or are directly relevant to the release. Do not perform repository-wide TODO, FIXME, debug, or scratch-file searches unless a specific release concern requires it.
+
+If suspicious development artefacts are detected:
+• warn clearly in the report
+• do not ignore them silently
+• use judgment on whether they are harmless or should block the release
+
+Before staging files, confirm the command is being run from the active repository root rather than a parent workspace directory.
+
+Verify that all staged files belong to the current repository only.
+
+For an internal-only fast-path checkpoint commit, keep repository-boundary protection lightweight:
+• verify the active repository root
+• use git status --short for the current repository
+• confirm no runtime or plugin files are included
+• stage only the intended internal maintenance files
+• do not expand into production-release-only checks
+
+If unrelated modified files already exist:
+• identify them clearly
+• separate release-critical files or internal-checkpoint files from unrelated work
+• when runtime changes and internal/tooling changes are mixed, prefer committing only the release-relevant runtime files for the production release
+• clearly identify the separated file groups
+• leave internal-only tooling or agent changes for a separate checkpoint commit unless explicitly requested
+• exclude sibling repository files and other out-of-repository changes from staging
+• do not silently include unrelated modifications in the release
+
+If needed, either:
+• commit only the intended release files, or
+• for an internal-only classification, commit only the intended internal/development files, or
+• stop and clearly report the exact blocker
+
+Do not abandon the workflow just because other files are modified.
+
+⸻
+
+4. Commit, push, tag, GitHub Release, and configured deployment
+
+For an internal/development-only classification:
+• create a normal checkpoint commit only
+• stage only intended files inside the active repository
+• use the internal-only fast path when the changes are clearly non-runtime maintenance only
+• push the commit to the current branch only after explicit push authority
+• do NOT create or push a tag
+• do NOT create a GitHub Release
+• do NOT trigger or hand off to a deployment workflow
+• preserve repository history and stop after final reporting
+
+For a production release classification, use the following steps. A pushed tag alone is not a completed production release.
+
+Pre-release completeness gate
+
+Use information already gathered earlier in the workflow whenever possible. Do not repeat repository analysis solely to regenerate information that has already been collected and remains valid.
+
+Before editing version files or creating a production release commit, the agent must confirm the release scope using the minimum repository checks needed to ensure all intended committed runtime/distributable changes are included.
+
+For production releases, run the minimum checks needed to safely confirm release scope. Normally this should be limited to:
+
+• current branch
+• current HEAD commit
+• latest existing version tag
+• git status –short –untracked-files=all
+• git diff –name-status latest-tag..HEAD
+• when the changed-file set is already clear, a concise changed-file summary may be used instead of additional classification passes
+• avoid repeated diff categorisation once release scope has been determined
+• git diff –name-status –cached
+• list of any modified or untracked files not yet committed
+
+Run the following additional checks only when ambiguity, release-risk concerns, repository-boundary concerns, packaging concerns, incomplete-release concerns, or other blockers require deeper validation:
+
+• git diff –name-status latest-tag..HEAD for runtime/distributable files only
+• git diff –name-status latest-tag..HEAD for internal/tooling files only
+• list of files that would be omitted from the tag if release proceeded now
+• list of files that would be included in the deploy package
+• list of files excluded by .distignore or packaging rules
+
+Default to the lightest validation path that can safely confirm release scope. Only expand into detailed file-by-file analysis, deployment-package analysis, omitted-file analysis, or repeated classification work when the initial summary identifies ambiguity, uncommitted runtime files, repository-boundary concerns, packaging concerns, release-risk concerns, or other blockers that could affect release safety.
+
+If any intended runtime/distributable file is modified or untracked but not committed, stop and report that the release would be incomplete.
+
+Do not proceed to version bump, commit, tag, or push until either:
+
+• all intended runtime/distributable files are committed, or
+• the agent clearly reports that the uncommitted files are unrelated and excludes them intentionally.
+
+Once version files are updated:
+• after explicit authority for commit and tag actions, commit the version/release metadata files only, but confirm that all intended runtime changes are already committed and included in HEAD before tagging
+• stage only intended files inside the active repository
+• after explicit push authority, push the commit to the main branch
+
+After explicit tag and push authority, create and push the tag using the exact required format:
+• the tag MUST be prefixed with v
+• example: v1.16.0 (not 1.16.0)
+• the tag MUST be created locally and pushed via git
+• do NOT rely on GitHub UI to create or modify tags
+
+For every production release, after pushing the version tag:
+• ensure a GitHub Release is created and published for that exact `vX.Y.Z` tag using the prepared release summary; if a repository workflow creates it automatically, monitor and verify that result instead of creating a duplicate
+• verify that the GitHub Release exists and references the pushed tag
+• do not treat a tag push, a workflow start, or an uploaded asset as a substitute for creating and verifying the GitHub Release
+
+Freemius applicability and deployment:
+• check whether `.github/workflows/deploy-to-freemius.yml` exists in the active repository
+• if it does not exist, report Freemius as not applicable; do not infer Freemius deployment from plugin type, configuration, a tag, or a GitHub Release
+• if it exists, inspect its configured triggers, job conditions, and deployment steps before releasing
+• use the workflow's actual configured mechanism to trigger Freemius deployment; do not assume that either a tag push or GitHub Release publication deploys to Freemius unless the workflow's upload step proves it
+• monitor the relevant workflow run and verify the configured Freemius deployment completed successfully
+• if the configured Freemius deployment fails, cannot be triggered, or cannot be verified, the production release is incomplete
+
+Other repository-configured release targets discovered during workflow inspection are also required. Do not report completion until each configured target is complete and verified.
+
+After explicit authority, do not stop before the authorised commit, push, and tag actions unless there is a real blocker such as merge conflict or auth failure.
+
+After any production release:
+• verify the working tree is clean
+• verify no unintended modified files remain
+• verify the pushed tag matches the released version
+• clearly report any remaining uncommitted files if the repository is not clean
+
+⸻
+
+5. Release notes preparation
+
+Use the new changelog entry as source material, then prepare a concise customer-facing summary of Square gateway changes.
+Include clear bullets for user-visible payment, compatibility, configuration, or update changes, but exclude secrets and internal implementation detail.
+
+Do not publish release notes manually unless explicitly required for this repository.
+Include them in the final report so they are ready to use if needed.
+
+⸻
+
+6. Final reporting
+
+At the end, show:
+• classification decision and reason
+• whether this was an internal checkpoint commit or a production release
+• confirmation that repository boundary checks were applied and only active-repository files were staged
+• the branch used, and whether the protected branch rule was satisfied or explicitly overridden
+• chosen bump type and reason for production releases, or explicitly state that no version bump was made for internal-only changes
+• new version for production releases, or explicitly state that the version was unchanged for internal-only changes
+• commit hash
+• pushed branch for internal checkpoint commits and production releases
+• tag (must include the v prefix) for production releases, or explicitly state that no tag was created for internal-only changes
+• whether main was pushed successfully
+• whether the tag was pushed successfully for production releases, or explicitly state that no tag push occurred for internal-only changes
+• whether the GitHub Release was created and verified for the production tag, or explicitly state that it was not applicable for internal-only changes
+• whether the post-release clean-state verification passed for production releases, or explicitly state that it was not applicable for internal-only changes
+• whether `.github/workflows/deploy-to-freemius.yml` was present, its actual Freemius trigger mechanism, and whether deployment was verified, not applicable, or blocked
+• the status of every other repository-configured release target
+• exact release summary prepared for production releases, or explicitly state that no customer release notes were created for internal-only changes
+• which optional steps were skipped because they were not applicable, including readme.txt stable tag updates, POT generation, and Freemius deployment when no Freemius workflow exists
+• any separated internal-only file groups or suspicious development artefacts that were detected
+• confirmation that all intended runtime/distributable changes are included in the release tag
+• confirmation that no uncommitted runtime/distributable files existed at the time the tag was created
+• provide detailed file lists, commit ranges, tag comparisons, package contents, or omitted-file reports only when a blocker, release-risk concern, incomplete release concern, packaging concern, or explicit user request requires them
+
+For a production release, report exactly one of:
+• `Production release complete` only when the GitHub Release and every repository-configured release target, including Freemius when `.github/workflows/deploy-to-freemius.yml` exists, are complete and verified
+• `Production release incomplete — blockers: ...` in every other case
+
+⸻
+
+For routine releases, keep reporting concise. GitHub already provides commit history, tag comparisons, release contents, and file-level inspection. Do not reproduce those details in release reports unless a blocker, release-risk concern, repository-boundary issue, packaging concern, incomplete-release condition, or explicit user request requires them.
+
+⸻
+
+7. Critical constraints
+• Do not edit readme.md or readme.txt beyond version hygiene unless explicitly asked
+• Do not include unrelated modified files in the release commit
+• Prefer committing only intended release files rather than stopping
+• Do not manually deploy to Freemius as part of this workflow
+• Do not make functional code changes during release workflows; report issues instead of fixing them
+• A GitHub Release is required for production releases when the repository uses GitHub Releases as part of its release process.
+• Internal/development-only changes may be included in an explicitly authorised repository commit without being turned into a production release.
+• Never stage, commit, or tag files from sibling repositories in the workspace.
+• Do not create empty production releases for non-runtime-only changes.
+• Use the internal-only fast path for clearly non-runtime maintenance changes instead of full production-release inspection.
+• Keep the workflow read/write capable, but operate only inside the active repository.
+• Do not repeatedly analyse the same repository state when previously collected information remains valid.
+• Prefer concise changed-file summaries over repeated file classification exercises.
+• Limit validation and investigation work to the files relevant to the release.
+• Once release safety has been established, proceed with the workflow instead of continuing exploratory investigation.
