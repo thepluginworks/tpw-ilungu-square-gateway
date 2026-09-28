@@ -170,30 +170,11 @@ Also include when relevant:
 
 ## Investigation Limits
 
-Before producing a plan:
+Start narrowly. After inspecting roughly ten files, pause internally and reassess whether further inspection is genuinely necessary.
 
-- start with the smallest reasonable scope
-- read only the files needed to understand the affected area
-- avoid repository-wide searches unless ownership is unclear
-- do not inspect shared plugins unless evidence suggests involvement
-- do not read documentation unrelated to the requested change
-- prefer producing an initial plan from available evidence rather than continuing exploratory analysis
-
-### Investigation Checkpoint
-
-If any of the following occur:
-
-- more than 10 files inspected
-- more than 2 plugins investigated
-- ownership remains unclear after initial analysis
-
-Stop and report:
-
-1. Findings so far.
-2. Remaining uncertainties.
-3. Additional files or systems that may need inspection.
-
-Do not continue expanding the investigation until the user confirms further analysis is required.
+- If the remaining files are still within the same plugin or a directly relevant dependency/provider contract, continue without asking Stuart, but inspect only the minimum additional evidence needed.
+- If the investigation is expanding into more than two plugins, unrelated subsystems, or materially broader scope than the original task, stop and report findings/uncertainties before continuing.
+- Do not keep reading files merely to be exhaustive once the ownership/contract question is sufficiently proven.
 
 ## Agent Escalation Decisions
 
