@@ -8,6 +8,8 @@
  * Version: 1.1.4
  * Text Domain: tpw-square-gateway
  * Domain Path: /languages
+ * Requires PHP: 7.4
+ * Requires at least: 6.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
