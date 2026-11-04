@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.1.5 - Unreleased
 
 - Raised the declared compatibility floor to PHP 8.3 and WordPress 6.5.
 - Aligned customer setup guidance with the supported runtime floor, administrator-only Square settings access, Square credential ownership, sandbox use, and support safety.

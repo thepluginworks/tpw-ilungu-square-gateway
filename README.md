@@ -1,6 +1,6 @@
 # iLungu Square Gateway
 
-Current version: 1.1.4
+Current version: 1.1.5
 
 iLungu Square Gateway is the production Square payments add-on for iLungu Club. It moves Square ownership out of the base platform while preserving the existing TPW checkout flow, settings keys, frontend payment boot process, and legacy `TPW_Square_Gateway` compatibility surface used by existing TPW integrations.
 

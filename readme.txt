@@ -3,7 +3,7 @@ Contributors: thepluginworks
 Tags: square, payments, tpw
 Requires at least: 6.5
 Requires PHP: 8.3
-Stable tag: 1.1.4
+Stable tag: 1.1.5
 License: GPL-3.0-or-later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -60,6 +60,13 @@ Use the established iLungu Club support channel for site-specific setup help. Do
 Deactivation is non-destructive. Uninstall preserves data by default. An administrator can enable Delete all plugin data on uninstall from the Square settings page; that opt-in removes only Square Gateway-owned local runtime state. Existing Square settings, iLungu Club payment records, and remote Square/provider records are always preserved.
 
 == Changelog ==
+
+= 1.1.5 =
+
+* Raised the declared compatibility floor to PHP 8.3 and WordPress 6.5.
+* Improved administrator-only Square settings safety, including preventing configured access tokens from appearing in settings HTML while preserving a stored token when the field is left blank.
+* Added GPL-3.0-or-later licensing declarations and the complete repository licence text.
+* Clarified customer setup, credential-ownership, sandbox, uninstall, and support guidance.
 
 = 1.1.4 =
 
