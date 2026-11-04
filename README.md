@@ -4,6 +4,8 @@ Current version: 1.1.4
 
 iLungu Square Gateway is the production Square payments add-on for iLungu Club. It moves Square ownership out of the base platform while preserving the existing TPW checkout flow, settings keys, frontend payment boot process, and legacy `TPW_Square_Gateway` compatibility surface used by existing TPW integrations.
 
+It is a free supporting payment integration for the iLungu ecosystem, distributed through GitHub under GPL-3.0-or-later.
+
 ## Features
 
 - Direct HTTP payment processing against Square's Payments API without bundling the legacy Square PHP SDK in the add-on.
@@ -15,7 +17,8 @@ iLungu Square Gateway is the production Square payments add-on for iLungu Club. 
 
 ## Requirements
 
-- WordPress with iLungu Club installed and active.
+- WordPress 6.5 or later with iLungu Club installed and active.
+- PHP 8.3 or later.
 - A Square application ID, access token, and location ID.
 - Square enabled as an active TPW payment method.
 
@@ -23,10 +26,17 @@ iLungu Square Gateway is the production Square payments add-on for iLungu Club. 
 
 1. Install and activate iLungu Club.
 2. Install and activate iLungu Square Gateway.
-3. Go to the iLungu Club payment settings and open the Square settings page.
-4. Enter the Square application ID, access token, and location ID.
-5. Enable sandbox mode only for test environments.
-6. Confirm Square is enabled as an active TPW payment method.
+3. Sign in as a WordPress administrator and go to the iLungu Club payment settings.
+4. Open the Square settings page and enter the application ID, access token, and location ID issued for the Square account that will process the site's payments.
+5. Enable sandbox mode only for a Square sandbox account in a test environment; disable it before using production Square credentials.
+6. Save the settings and confirm Square is enabled as an active TPW payment method.
+
+## Credential ownership and support
+
+- The Square account owner supplies and controls the application ID, access token, and location ID. Do not send access tokens in support requests, screenshots, source code, or repository issues.
+- Square settings are available only from the administrator-protected iLungu Club settings route. The add-on uses the existing `tpw_square_*` option keys for compatibility with iLungu Club; they are retained on uninstall.
+- This add-on does not own iLungu Club payment records or remote Square data. See **Data Retention** for the exact local cleanup boundary.
+- Use the established iLungu Club support channel for site-specific setup help. Do not share production credentials when requesting support.
 
 ## Version History
 
@@ -39,6 +49,10 @@ iLungu Square Gateway is distributed through GitHub releases.
 - Production install packages are published as `tpw-ilungu-square-gateway.zip` with the correct `tpw-ilungu-square-gateway/` archive root.
 - WordPress update checks read the public manifest at `https://thepluginworks.github.io/tpw-ilungu-square-gateway/tpw-ilungu-square-gateway.json`.
 - One-click updates use the exact tagged GitHub release asset URL published in that manifest.
+
+## License
+
+iLungu Square Gateway is licensed under the GNU General Public License, version 3 or later (GPL-3.0-or-later). See [LICENSE](LICENSE) for the complete licence text.
 
 ## Data Retention
 

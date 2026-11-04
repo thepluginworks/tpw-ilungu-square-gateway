@@ -12,7 +12,13 @@ class TPW_Square_Gateway_Settings {
 
     public function register_settings(): void {
         register_setting( 'tpw_payment_settings', 'tpw_square_app_id' );
-        register_setting( 'tpw_payment_settings', 'tpw_square_access_token' );
+        register_setting(
+            'tpw_payment_settings',
+            'tpw_square_access_token',
+            [
+                'sanitize_callback' => [ $this, 'save_access_token' ],
+            ]
+        );
         register_setting( 'tpw_payment_settings', 'tpw_square_location_id' );
         register_setting( 'tpw_payment_settings', 'tpw_square_sandbox_mode' );
         register_setting(
@@ -53,6 +59,16 @@ class TPW_Square_Gateway_Settings {
         }
 
         return round( $normalized, 2 );
+    }
+
+    public function save_access_token( $value ): string {
+        $token = trim( (string) $value );
+
+        if ( '' !== $token ) {
+            return $token;
+        }
+
+        return (string) get_option( 'tpw_square_access_token', '' );
     }
 
     public function save_method_label_square( $value ): string {

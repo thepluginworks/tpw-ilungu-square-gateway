@@ -47,7 +47,10 @@ if ( ! is_string( $current_label ) || '' == $current_label ) {
             </tr>
             <tr>
                 <th scope="row"><label for="tpw_square_access_token"><?php esc_html_e( 'Access Token', 'tpw-square-gateway' ); ?></label></th>
-                <td><input type="password" name="tpw_square_access_token" id="tpw_square_access_token" value="<?php echo esc_attr( get_option( 'tpw_square_access_token' ) ); ?>" class="regular-text" /></td>
+                <td>
+                    <input type="password" name="tpw_square_access_token" id="tpw_square_access_token" value="" class="regular-text" autocomplete="new-password" />
+                    <p class="description"><?php esc_html_e( 'Leave blank to keep the existing access token. Enter a value only to replace it.', 'tpw-square-gateway' ); ?></p>
+                </td>
             </tr>
             <tr>
                 <th scope="row"><label for="tpw_square_location_id"><?php esc_html_e( 'Location ID', 'tpw-square-gateway' ); ?></label></th>

@@ -2,9 +2,13 @@
 
 ## Unreleased
 
+- Raised the declared compatibility floor to PHP 8.3 and WordPress 6.5.
+- Aligned customer setup guidance with the supported runtime floor, administrator-only Square settings access, Square credential ownership, sandbox use, and support safety.
 - Added an administrator-controlled, opt-in uninstall cleanup that removes only Square Gateway-owned runtime transients.
 - Preserved compatibility settings, iLungu Club payment data, and all remote Square provider records during uninstall.
 - Removed sensitive payment request diagnostics from the shared PHP error log.
+- Added GPL-3.0-or-later licensing declarations and the complete repository licence text.
+- Added bounded minimum-runtime and HTTP settings-security coverage, including access-token non-disclosure and blank-token preservation.
 
 ## 1.1.4 - 2026-08-17
 
