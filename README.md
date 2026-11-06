@@ -38,6 +38,18 @@ It is a free supporting payment integration for the iLungu ecosystem, distribute
 - This add-on does not own iLungu Club payment records or remote Square data. See **Data Retention** for the exact local cleanup boundary.
 - Use the established iLungu Club support channel for site-specific setup help. Do not share production credentials when requesting support.
 
+## Payment recovery API
+
+The legacy `TPW_Square_Gateway::process_payment( array $args )` contract remains compatible. Consumers that omit `idempotency_key` continue to receive an automatically generated Square key.
+
+Payment-owning integrations that need safe retry and reconciliation can supply a stable, non-empty string of up to 192 characters in `idempotency_key`. The gateway passes it unchanged to Square. The caller must persist that key and replay the identical payment request with the same key after an uncertain transport result; it must not create a replacement key for that retry.
+
+Successful payment responses retain the existing `Square\Types\CreatePaymentResponse`-compatible adapter. Persist `getPayment()->getId()` and reconcile it through the additive `TPW_Square_Gateway::get_payment( string $payment_id )` API. It uses Square's authenticated payment lookup and returns the same response adapter or a `WP_Error`.
+
+`WP_Error` codes and response types are unchanged. Gateway payment errors now include additive `outcome` metadata: `failed` means Square returned a terminal/request failure, while `uncertain` means that no payment outcome can safely be inferred. For an uncertain create result, `retry_with_same_idempotency_key` is `true`. Do not release capacity, issue fulfilment, or submit a new payment while a result remains uncertain.
+
+Square does not provide payment lookup by idempotency key. If a payment ID was not received, recovery is limited to promptly replaying the identical create request with the same key. After Square's retry/idempotency period, a key alone cannot prove the final provider outcome.
+
 ## Version History
 
 See [CHANGELOG.md](CHANGELOG.md) for release history.

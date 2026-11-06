@@ -9,6 +9,7 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
     private const API_VERSION = '2026-01-22';
     private const SANDBOX_API_BASE = 'https://connect.squareupsandbox.com';
     private const PRODUCTION_API_BASE = 'https://connect.squareup.com';
+    private const IDEMPOTENCY_KEY_MAX_LENGTH = 192;
 
     public static function is_enabled(): bool {
         $methods = get_option( 'tpw_active_payment_methods', [] );
@@ -24,6 +25,11 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
         $access_token = get_option( 'tpw_square_access_token' );
         $is_sandbox   = '1' === (string) get_option( 'tpw_square_sandbox_mode' );
         $location_id  = get_option( 'tpw_square_location_id' );
+        $idempotency_key = self::get_idempotency_key( $args );
+
+        if ( is_wp_error( $idempotency_key ) ) {
+            return $idempotency_key;
+        }
 
         if ( empty( $access_token ) ) {
             error_log( '[TPW ERROR] Square payment request rejected: missing_access_token.' );
@@ -31,11 +37,15 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
             return new WP_Error(
                 'square_payment_error',
                 'Payment service error. Please try again.',
-                [ 'detail' => 'Square access token is missing.' ]
+                [
+                    'detail'                         => 'Square access token is missing.',
+                    'outcome'                        => 'failed',
+                    'retry_with_same_idempotency_key' => false,
+                ]
             );
         }
 
-        $request_body = self::build_request_body( $args, (string) $location_id );
+        $request_body = self::build_request_body( $args, (string) $location_id, $idempotency_key );
 
         $response = wp_remote_post(
             self::get_api_url( $is_sandbox ),
@@ -58,7 +68,11 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
             return new WP_Error(
                 'square_payment_error',
                 'Payment service error. Please try again.',
-                [ 'detail' => $response->get_error_message() ]
+                [
+                    'detail'                         => $response->get_error_message(),
+                    'outcome'                        => 'uncertain',
+                    'retry_with_same_idempotency_key' => true,
+                ]
             );
         }
 
@@ -75,6 +89,8 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
                 [
                     'status' => $status_code,
                     'detail' => 'Invalid JSON response from Square.',
+                    'outcome' => 'uncertain',
+                    'retry_with_same_idempotency_key' => true,
                 ]
             );
         }
@@ -82,6 +98,7 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
         if ( $status_code >= 400 || ! empty( $payload['errors'] ) ) {
             $normalized = self::normalize_square_errors( $payload['errors'] ?? [] );
             $friendly   = self::friendly_message_for_errors( $normalized );
+            $outcome    = self::get_outcome_for_api_error( $status_code, $normalized );
 
             error_log( '[TPW ERROR] Square API error: status=' . $status_code . ' codes=' . implode( ',', array_map( static function ( $item ) {
                 return $item['code'];
@@ -101,6 +118,8 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
                     }, $normalized ),
                     'require_new_nonce' => self::require_new_nonce( $normalized ),
                     'raw_errors'        => $normalized,
+                    'outcome'           => $outcome,
+                    'retry_with_same_idempotency_key' => 'uncertain' === $outcome,
                 ]
             );
         }
@@ -114,6 +133,8 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
                 [
                     'status' => $status_code,
                     'detail' => 'Square response did not include a payment payload.',
+                    'outcome' => 'uncertain',
+                    'retry_with_same_idempotency_key' => true,
                 ]
             );
         }
@@ -121,7 +142,125 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
         return new TPW_Square_Gateway_Create_Payment_Response( $payload, $status_code );
     }
 
-    private static function build_request_body( array $args, string $location_id ): array {
+    public static function get_payment( string $payment_id ) {
+        if ( '' === $payment_id ) {
+            return new WP_Error(
+                'square_invalid_request',
+                'Payment service error. Please try again.',
+                [
+                    'detail'                         => 'Square payment ID is required.',
+                    'outcome'                        => 'failed',
+                    'retry_with_same_idempotency_key' => false,
+                ]
+            );
+        }
+
+        $access_token = get_option( 'tpw_square_access_token' );
+        $is_sandbox   = '1' === (string) get_option( 'tpw_square_sandbox_mode' );
+
+        if ( empty( $access_token ) ) {
+            error_log( '[TPW ERROR] Square payment lookup rejected: missing_access_token.' );
+
+            return new WP_Error(
+                'square_payment_error',
+                'Payment service error. Please try again.',
+                [
+                    'detail'                         => 'Square access token is missing.',
+                    'outcome'                        => 'failed',
+                    'retry_with_same_idempotency_key' => false,
+                ]
+            );
+        }
+
+        $response = wp_remote_get(
+            self::get_payment_url( $is_sandbox, $payment_id ),
+            [
+                'timeout' => 45,
+                'headers' => self::get_api_headers( $access_token ),
+            ]
+        );
+
+        if ( is_wp_error( $response ) ) {
+            error_log( '[TPW ERROR] Square payment lookup failed: transport_error.' );
+
+            return new WP_Error(
+                'square_payment_error',
+                'Payment service error. Please try again.',
+                [
+                    'detail'                         => $response->get_error_message(),
+                    'outcome'                        => 'uncertain',
+                    'retry_with_same_idempotency_key' => false,
+                ]
+            );
+        }
+
+        $status_code = (int) wp_remote_retrieve_response_code( $response );
+        $raw_body    = wp_remote_retrieve_body( $response );
+        $payload     = json_decode( $raw_body, true );
+
+        if ( ! is_array( $payload ) ) {
+            error_log( '[TPW ERROR] Square payment lookup failed: invalid_json status=' . $status_code . '.' );
+
+            return new WP_Error(
+                'square_payment_error',
+                'Unexpected payment error. Please try again.',
+                [
+                    'status'                         => $status_code,
+                    'detail'                         => 'Invalid JSON response from Square.',
+                    'outcome'                        => 'uncertain',
+                    'retry_with_same_idempotency_key' => false,
+                ]
+            );
+        }
+
+        if ( $status_code >= 400 || ! empty( $payload['errors'] ) ) {
+            $normalized = self::normalize_square_errors( $payload['errors'] ?? [] );
+            $friendly   = self::friendly_message_for_errors( $normalized );
+            $outcome    = self::get_outcome_for_api_error( $status_code, $normalized );
+
+            error_log( '[TPW ERROR] Square payment lookup API error: status=' . $status_code . ' codes=' . implode( ',', array_map( static function ( $item ) {
+                return $item['code'];
+            }, $normalized ) ) . ' category=' . ( $normalized[0]['category'] ?? '' ) );
+
+            return new WP_Error(
+                self::wp_error_code_for_errors( $normalized ),
+                $friendly,
+                [
+                    'status'                         => $status_code,
+                    'category'                       => $normalized[0]['category'] ?? null,
+                    'codes'                          => array_map( static function ( $item ) {
+                        return $item['code'];
+                    }, $normalized ),
+                    'details'                        => array_map( static function ( $item ) {
+                        return $item['detail'];
+                    }, $normalized ),
+                    'require_new_nonce'              => false,
+                    'raw_errors'                     => $normalized,
+                    'outcome'                        => $outcome,
+                    'retry_with_same_idempotency_key' => false,
+                ]
+            );
+        }
+
+        if ( empty( $payload['payment'] ) || ! is_array( $payload['payment'] ) ) {
+            error_log( '[TPW ERROR] Square payment lookup failed: missing_payment status=' . $status_code . '.' );
+
+            return new WP_Error(
+                'square_payment_error',
+                'Unexpected payment error. Please try again.',
+                [
+                    'status'                         => $status_code,
+                    'detail'                         => 'Square response did not include a payment payload.',
+                    'outcome'                        => 'uncertain',
+                    'retry_with_same_idempotency_key' => false,
+                ]
+            );
+        }
+
+        return new TPW_Square_Gateway_Create_Payment_Response( $payload, $status_code );
+    }
+
+    private static function build_request_body( array $args, string $location_id, string $idempotency_key ): array {
         if ( class_exists( 'TPW_Core_Payments' ) ) {
             $calc = TPW_Core_Payments::tpw_core_calculate_payable_total( (float) ( $args['amount'] ?? 0 ), 'square' );
             $charge_amount = (float) $calc['total_with_surcharge'];
@@ -131,7 +270,7 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
 
         return [
             'source_id'       => (string) ( $args['nonce'] ?? '' ),
-            'idempotency_key' => self::generate_idempotency_key(),
+            'idempotency_key' => $idempotency_key,
             'amount_money'    => [
                 'amount'   => (int) round( $charge_amount * 100 ),
                 'currency' => 'GBP',
@@ -173,6 +312,51 @@ class TPW_Square_Gateway_Direct_HTTP_Client {
         $base = $is_sandbox ? self::SANDBOX_API_BASE : self::PRODUCTION_API_BASE;
 
         return $base . '/v2/payments';
+    }
+
+    private static function get_payment_url( bool $is_sandbox, string $payment_id ): string {
+        return self::get_api_url( $is_sandbox ) . '/' . rawurlencode( $payment_id );
+    }
+
+    private static function get_api_headers( string $access_token ): array {
+        return [
+            'Authorization'  => 'Bearer ' . $access_token,
+            'Content-Type'   => 'application/json',
+            'Accept'         => 'application/json',
+            'Square-Version' => self::API_VERSION,
+        ];
+    }
+
+    private static function get_idempotency_key( array $args ) {
+        if ( ! array_key_exists( 'idempotency_key', $args ) ) {
+            return self::generate_idempotency_key();
+        }
+
+        $idempotency_key = $args['idempotency_key'];
+
+        if ( ! is_string( $idempotency_key ) || '' === $idempotency_key || strlen( $idempotency_key ) > self::IDEMPOTENCY_KEY_MAX_LENGTH ) {
+            return new WP_Error(
+                'square_invalid_request',
+                'Payment service error. Please try again.',
+                [
+                    'detail'                         => 'Square idempotency key must be a non-empty string of at most 192 characters.',
+                    'outcome'                        => 'failed',
+                    'retry_with_same_idempotency_key' => false,
+                ]
+            );
+        }
+
+        return $idempotency_key;
+    }
+
+    private static function get_outcome_for_api_error( int $status_code, array $errors ): string {
+        $category = strtoupper( (string) ( $errors[0]['category'] ?? '' ) );
+
+        if ( $status_code >= 500 || in_array( $category, [ 'API_ERROR', 'RATE_LIMIT_ERROR' ], true ) ) {
+            return 'uncertain';
+        }
+
+        return 'failed';
     }
 
     private static function normalize_square_errors( array $errors ): array {
