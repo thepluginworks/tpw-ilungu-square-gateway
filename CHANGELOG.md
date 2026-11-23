@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.2.0 - 2026-11-23
+
+- Added payment lookup and caller-supplied idempotency keys for payment recovery.
+- Added metadata to identify uncertain payment outcomes.
+
 ## 1.1.5 - Unreleased
 
 - Raised the declared compatibility floor to PHP 8.3 and WordPress 6.5.
